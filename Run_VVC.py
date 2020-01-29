@@ -6,7 +6,7 @@ import os, sys, subprocess, pdb
 import argparse
 import ConfigParser
 import datetime, math, time
-
+import ntpath
 
 INF = 999
 
@@ -75,29 +75,50 @@ def call_bg_file(cmd,fidProcess):
 
 ###--------------------------------------------------------------
 def Encode_decode_video():
+    encoderlog=[]
+    decoderlog=[]
+    VMAFlog=[]
     now_start=[]
     now_end=[]
     now_start.append(datetime.datetime.now())
     print('Encoding  {}'.format(now_start[0].strftime("%Y-%m-%d %H:%M:%S")))
     InputYUV='{}.yuv'.format(vid[:-4])
-    OutputYUV='{}_recon.yuv'.format(vid[:-4])
-    BitstreamFile='VCCncoded.bin'
-    osout = call('rm -rf {}'.format(BitstreamFile))
-    #osout = call('cp -f ./encoder_HMS.cfg {}/Part{}/encoder_HMS.cfg'.format(Split_video_path,Pcnt))
-    encoderlogfile='encoderlog.dat'
-    fid = open(encoderlogfile,'w')
-    #osout=call_bg_file('./VVCOrig/bin/EncoderAppStatic -c ./VVCOrig/cfg/encoder_lowdelay_P_vtm.cfg -c ./VVCOrig/cfg/encoder_VVC_GOP.cfg --InputFile={} --SourceWidth={} --SourceHeight={} --SAO=0 --QP={} --FrameRate={} --FramesToBeEncoded={} --MaxCUSize={} --MaxPartitionDepth={}  --BitstreamFile="{}" --RateControl={} --TargetBitrate={}'.format(Split_video_path,Pcnt,Split_video_path,Pcnt,Pcnt,InputYUV,Width,Hight,QP,fps,GOP,MaxCUSize,MaxPartitionDepth,BitstreamFile,RateControl,rate),fid)
+    fname = ntpath.basename(InputYUV)[:-4]
+    for cnt in range(len(rate)):
+       BitstreamFile='{}/VVCencoded_{}_{}.bin'.format(Path,fname,rate[cnt])
+       ReconYUV='{}/VVCrecon_{}_{}.yuv'.format(Path,fname,rate[cnt])
+       encoderlogfile='{}/VVCencoderlog_{}_{}.dat'.format(Path,fname,rate[cnt])
+       fid = open(encoderlogfile,'w')
+       osout = call_bg_file('./VVCOrig/bin/EncoderAppStatic -c ./VVCOrig/cfg/encoder_lowdelay_P_vtm.cfg -c ./VVCOrig/cfg/encoder_VVC_GOP.cfg --InputFile={} --SourceWidth={} --SourceHeight={} --SAO=0 --InitialQP={} --FrameRate={} --FramesToBeEncoded={} --MaxCUSize={} --MaxPartitionDepth={}  --BitstreamFile="{}" --RateControl={} --TargetBitrate={} --ReconFile={}'.format(InputYUV,Width,Hight,QP,fps,NumFrames,MaxCUSize,MaxPartitionDepth,BitstreamFile,RateControl,rate[cnt],ReconYUV),fid)
+       encoderlog.append(osout)
 
-    call('./VVCOrig/bin/EncoderAppStatic -c ./VVCOrig/cfg/encoder_lowdelay_P_vtm.cfg -c ./VVCOrig/cfg/encoder_VVC_GOP.cfg --InputFile={} --SourceWidth={} --SourceHeight={} --SAO=0 --InitialQP={} --FrameRate={} --FramesToBeEncoded={} --MaxCUSize={} --MaxPartitionDepth={}  --BitstreamFile="{}" --RateControl={} --TargetBitrate={}'.format(InputYUV,Width,Hight,QP,fps,NumFrames,MaxCUSize,MaxPartitionDepth,BitstreamFile,RateControl,rate))
+    for cnt in range(len(rate)):
+       encoderlog[cnt].wait()
 
-    ### decosing ------------
-    call('./VVCOrig/bin/DecoderAppStatic -b {} -o {}'.format(BitstreamFile,OutputYUV))
-    #encoderlog.append(osout)
-    #PcntCompleted.append(Pcnt)
+    ### decoding ------------
+    for cnt in range(len(rate)):
+       OutputYUV='{}/VVCoutput_{}_{}.yuv'.format(Path,fname,rate[cnt])
+       #osout = call('rm -rf {}'.format(Path,OutputYUV))
+       BitstreamFile='{}/VVCencoded_{}_{}.bin'.format(Path,fname,rate[cnt])
+       decoderlogfile='{}/VVCdecoderlog_{}_{}.dat'.format(Path,fname,rate[cnt])
+       fid = open(decoderlogfile,'w')
+       osout = call_bg_file('./VVCOrig/bin/DecoderAppStatic -b {} -o {}'.format(BitstreamFile,OutputYUV),fid)
+       decoderlog.append(osout)
+
+    for cnt in range(len(rate)):
+       decoderlog[cnt].wait()
 
     ### VMAF --------
 
-    call('../vmaf/run_vmaf yuv420p {} {} {} {}'.format(Width,Hight,OutputYUV,InputYUV))
+    for cnt in range(len(rate)):
+       OutputYUV='{}/VVCoutput_{}_{}.yuv'.format(Path,fname,rate[cnt])
+       VMAFlogfile='{}/VVCVMAFlog_{}_{}.dat'.format(Path,fname,rate[cnt])
+       fid = open(VMAFlogfile,'w')
+       osout = call_bg_file('../vmaf/run_vmaf yuv420p {} {} {} {}'.format(Width,Hight,InputYUV,OutputYUV),fid)
+       VMAFlog.append(osout)
+
+    for cnt in range(len(rate)):
+       VMAFlog[cnt].wait()
 
     '''
          if (int(len(PcntCompleted) % NProcesses) == 0):
@@ -197,6 +218,8 @@ if __name__ == "__main__":
     MaxCUSize=int(args.maxcusize);
     MaxPartitionDepth=int(args.maxpartitiondepth);
     RateControl=int(args.ratecontrol);
-    rate=int(args.rate);
+    rate_str = args.rate.split(' ')
+    rate = [int(r) for r in rate_str]
     NumFrames=int(args.numframes)
+    Path = args.resultspath
     Encode_decode_video()
