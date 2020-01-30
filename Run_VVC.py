@@ -55,7 +55,7 @@ def call(cmd):
     # proc = subprocess.Popen(["cat", "/etc/services"], stdout=subprocess.PIPE, shell=True)
     #proc = subprocess.Popen(cmd, \
     #               stdout=subprocess.PIPE, shell=True)
-    print(cmd)
+    #print(cmd)
     subprocess.call(cmd,shell=True)
     #proc = subprocess.Popen(cmd,stdout=subprocess.PIPE, shell=True)
     #(out, err) = proc.communicate()
