@@ -87,7 +87,7 @@ def Encode_decode_video():
     for cnt in range(len(rate)):
        BitstreamFile='{}/VVCencoded_{}_{}.bin'.format(Path,fname,rate[cnt])
        ReconYUV='{}/VVCrecon_{}_{}.yuv'.format(Path,fname,rate[cnt])
-       encoderlogfile='{}/VVCencoderlog_{}_{}.dat'.format(Path,fname,rate[cnt])
+       encoderlogfile='{}/VVClog_{}_{}.dat'.format(Path,fname,rate[cnt])
        fid = open(encoderlogfile,'w')
        osout = call_bg_file('./VVCOrig/bin/EncoderAppStatic -c ./VVCOrig/cfg/encoder_lowdelay_P_vtm.cfg -c ./VVCOrig/cfg/encoder_VVC_GOP.cfg --InputFile={} --SourceWidth={} --SourceHeight={} --SAO=0 --InitialQP={} --FrameRate={} --FramesToBeEncoded={} --MaxCUSize={} --MaxPartitionDepth={}  --BitstreamFile="{}" --RateControl={} --TargetBitrate={} --ReconFile={}'.format(InputYUV,Width,Hight,QP,fps,NumFrames,MaxCUSize,MaxPartitionDepth,BitstreamFile,RateControl,rate[cnt],ReconYUV),fid)
        encoderlog.append(osout)
@@ -112,8 +112,8 @@ def Encode_decode_video():
 
     for cnt in range(len(rate)):
        OutputYUV='{}/VVCoutput_{}_{}.yuv'.format(Path,fname,rate[cnt])
-       VMAFlogfile='{}/VVCVMAFlog_{}_{}.dat'.format(Path,fname,rate[cnt])
-       fid = open(VMAFlogfile,'w')
+       VMAFlogfile='{}/VVClog_{}_{}.dat'.format(Path,fname,rate[cnt])
+       fid = open(VMAFlogfile,'a')
        osout = call_bg_file('../vmaf/run_vmaf yuv420p {} {} {} {}'.format(Width,Hight,InputYUV,OutputYUV),fid)
        VMAFlog.append(osout)
 
