@@ -119,6 +119,9 @@ def Encode_decode_video():
 
     for cnt in range(len(rate)):
        VMAFlog[cnt].wait()
+       VMAFlogfile='{}/VVClog_{}_{}.dat'.format(Path,fname,rate[cnt])
+       ### replace Frame to VMAF_Frame in the log file
+       call('./Replace_Frame_to_VMAF_Frame --fn {}'.format(VMAFlogfile))
 
     '''
          if (int(len(PcntCompleted) % NProcesses) == 0):
