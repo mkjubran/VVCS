@@ -1551,7 +1551,7 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
       bestPos=i;
     }
   }
-  CHECK(!(bestPos <= 15), "Unspecified error");
+  CHECK(!(bestPos <= 63), "Unspecified error"); //jubran was 15
     pps.setNumRefIdxL0DefaultActive(bestPos);
   pps.setNumRefIdxL1DefaultActive(bestPos);
   pps.setLog2MaxTransformSkipBlockSize(m_log2MaxTransformSkipBlockSize);

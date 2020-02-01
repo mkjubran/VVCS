@@ -139,9 +139,9 @@ static const double MAX_DOUBLE =                             1.7e+308; ///< max.
 // ====================================================================================================================
 // Most of these should not be changed - they resolve the meaning of otherwise magic numbers.
 
-static const int MAX_GOP =                                         64; ///< max. value of hierarchical GOP size
-static const int MAX_NUM_REF_PICS =                                16; ///< max. number of pictures used for reference
-static const int MAX_NUM_REF =                                     16; ///< max. number of entries in picture reference list
+static const int MAX_GOP =                                         64000; ///< max. value of hierarchical GOP size - jubran was 64
+static const int MAX_NUM_REF_PICS =                                64; ///< max. number of pictures used for reference - jubran was 16
+static const int MAX_NUM_REF =                                     64; ///< max. number of entries in picture reference list - jubran was 16
 static const int MAX_QP =                                          63;
 static const int NOT_VALID =                                       -1;
 
@@ -286,7 +286,7 @@ static const int LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS = 1 << MV_FRACTI
 static const int CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS = 1 << (MV_FRACTIONAL_BITS_INTERNAL + 1);
 
 static const int MAX_NUM_SUB_PICS =                               255;
-static const int MAX_NUM_LONG_TERM_REF_PICS =                      33;
+static const int MAX_NUM_LONG_TERM_REF_PICS =                      65; //jubran was 33
 static const int NUM_LONG_TERM_REF_PIC_SPS =                        0;
 
 

@@ -592,11 +592,11 @@ void HLSyntaxReader::parsePPS( PPS* pcPPS, ParameterSetManager *parameterSetMana
   READ_FLAG( uiCode,   "cabac_init_present_flag" );            pcPPS->setCabacInitPresentFlag( uiCode ? true : false );
 
   READ_UVLC(uiCode, "num_ref_idx_l0_default_active_minus1");
-  CHECK(uiCode > 14, "Invalid code read");
+  CHECK(uiCode > 64, "Invalid code read"); //jubran was 14
   pcPPS->setNumRefIdxL0DefaultActive(uiCode+1);
 
   READ_UVLC(uiCode, "num_ref_idx_l1_default_active_minus1");
-  CHECK(uiCode > 14, "Invalid code read");
+  CHECK(uiCode > 64, "Invalid code read"); //jubran was 14
   pcPPS->setNumRefIdxL1DefaultActive(uiCode+1);
 
   READ_FLAG(uiCode, "rpl1_idx_present_flag");
