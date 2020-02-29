@@ -95,29 +95,12 @@ def Encode_decode_video():
     for cnt in range(len(rate)):
        encoderlog[cnt].wait()
 
-    ### decoding ------------
-    for cnt in range(len(rate)):
-       OutputYUV='{}/VVCoutput_{}_{}.yuv'.format(Path,fname,rate[cnt])
-       #osout = call('rm -rf {}'.format(Path,OutputYUV))
-       BitstreamFile='{}/VVCencoded_{}_{}.bin'.format(Path,fname,rate[cnt])
-       decoderlogfile='{}/VVCdecoderlog_{}_{}.dat'.format(Path,fname,rate[cnt])
-       fid = open(decoderlogfile,'w')
-       osout = call_bg_file('./VVCOrig/bin/DecoderAppStatic -b {} -o {}'.format(BitstreamFile,OutputYUV),fid)
-       decoderlog.append(osout)
-
-    for cnt in range(len(rate)):
-       decoderlog[cnt].wait()
-
-    ### VMAF --------
-
-    for cnt in range(len(rate)):
+       ### VMAF --------
        OutputYUV='{}/VVCoutput_{}_{}.yuv'.format(Path,fname,rate[cnt])
        VMAFlogfile='{}/VVClog_{}_{}.dat'.format(Path,fname,rate[cnt])
        fid = open(VMAFlogfile,'a')
        osout = call_bg_file('../vmaf/run_vmaf yuv420p {} {} {} {}'.format(Width,Hight,InputYUV,OutputYUV),fid)
        VMAFlog.append(osout)
-
-    for cnt in range(len(rate)):
        VMAFlog[cnt].wait()
        VMAFlogfile='{}/VVClog_{}_{}.dat'.format(Path,fname,rate[cnt])
        ### replace Frame to VMAF_Frame in the log file

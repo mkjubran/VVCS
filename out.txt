@@ -1,0 +1,52 @@
+
+VVCSoftware: VTM Encoder Version 7.3 [Linux][GCC 7.4.0][64 bit] [SIMD=AVX2] 
+
+curGOP=0 ... curPOC=1 ... absPOC=0 ... deltaRefPics=1
+curGOP=0 ... curPOC=1 ... absPOC=-1 ... deltaRefPics=2
+curGOP=0 ... curPOC=1 ... absPOC=-2 ... deltaRefPics=3
+curGOP=0 ... curPOC=1 ... absPOC=-3 ... deltaRefPics=4
+curGOP=1 ... curPOC=2 ... absPOC=1 ... deltaRefPics=1
+curGOP=1 ... curPOC=2 ... absPOC=0 ... deltaRefPics=2
+curGOP=1 ... curPOC=2 ... absPOC=-1 ... deltaRefPics=3
+curGOP=1 ... curPOC=2 ... absPOC=-2 ... deltaRefPics=4
+curGOP=2 ... curPOC=3 ... absPOC=2 ... deltaRefPics=1
+curGOP=2 ... curPOC=3 ... absPOC=1 ... deltaRefPics=2
+curGOP=2 ... curPOC=3 ... absPOC=0 ... deltaRefPics=3
+curGOP=2 ... curPOC=3 ... absPOC=-1 ... deltaRefPics=4
+curGOP=3 ... curPOC=4 ... absPOC=3 ... deltaRefPics=1
+curGOP=3 ... curPOC=4 ... absPOC=2 ... deltaRefPics=2
+curGOP=3 ... curPOC=4 ... absPOC=1 ... deltaRefPics=3
+curGOP=3 ... curPOC=4 ... absPOC=0 ... deltaRefPics=4
+curGOP=4 ... curPOC=5 ... absPOC=4 ... deltaRefPics=1
+curGOP=4 ... curPOC=5 ... absPOC=3 ... deltaRefPics=2
+curGOP=4 ... curPOC=5 ... absPOC=2 ... deltaRefPics=3
+curGOP=4 ... curPOC=5 ... absPOC=1 ... deltaRefPics=4
+curGOP=5 ... curPOC=6 ... absPOC=5 ... deltaRefPics=1
+curGOP=5 ... curPOC=6 ... absPOC=4 ... deltaRefPics=2
+curGOP=5 ... curPOC=6 ... absPOC=3 ... deltaRefPics=3
+curGOP=5 ... curPOC=6 ... absPOC=2 ... deltaRefPics=4
+curGOP=6 ... curPOC=7 ... absPOC=6 ... deltaRefPics=1
+curGOP=6 ... curPOC=7 ... absPOC=5 ... deltaRefPics=2
+curGOP=6 ... curPOC=7 ... absPOC=4 ... deltaRefPics=3
+curGOP=6 ... curPOC=7 ... absPOC=3 ... deltaRefPics=4
+curGOP=7 ... curPOC=8 ... absPOC=7 ... deltaRefPics=1
+curGOP=7 ... curPOC=8 ... absPOC=6 ... deltaRefPics=2
+curGOP=7 ... curPOC=8 ... absPOC=5 ... deltaRefPics=3
+curGOP=7 ... curPOC=8 ... absPOC=4 ... deltaRefPics=4
+curGOP=0 ... curPOC=9 ... absPOC=8 ... deltaRefPics=1
+curGOP=0 ... curPOC=9 ... absPOC=7 ... deltaRefPics=2
+curGOP=0 ... curPOC=9 ... absPOC=6 ... deltaRefPics=3
+curGOP=0 ... curPOC=9 ... absPOC=5 ... deltaRefPics=4
+curGOP=1 ... curPOC=10 ... absPOC=9 ... deltaRefPics=1
+curGOP=1 ... curPOC=10 ... absPOC=8 ... deltaRefPics=2
+curGOP=1 ... curPOC=10 ... absPOC=7 ... deltaRefPics=3
+curGOP=1 ... curPOC=10 ... absPOC=6 ... deltaRefPics=4
+curGOP=2 ... curPOC=11 ... absPOC=10 ... deltaRefPics=1
+curGOP=2 ... curPOC=11 ... absPOC=9 ... deltaRefPics=2
+curGOP=2 ... curPOC=11 ... absPOC=8 ... deltaRefPics=3
+curGOP=2 ... curPOC=11 ... absPOC=7 ... deltaRefPics=4
+TOOL CFG: IBD:0 HAD:1 RDQ:1 RDQTS:1 RDpenalty:0 LQP:0 SQP:0 ASR:0 MinSearchWindow:8 RestrictMESampling:0 FEN:1 ECU:0 FDM:1 CFM:0 ESD:0 TransformSkip:1 TransformSkipFast:1 TransformSkipLog2MaxSize:5 ChromaTS:1 BDPCM:0 Tiles: 1x1 Slices: 1 MCTS:0 SAO:0 ALF:1 CCALF:1 WPP:0 WPB:0 PME:2  WaveFrontSynchro:0 WaveFrontSubstreams:1 ScalingList:0 TMVPMode:1  DQ:1  SignBitHidingFlag:0 RecalQP:0 
+TOOL CFG: LFNST:0 MMVD:1 Affine:1 AffineType:1 PROF:1 SubPuMvp:1+0 DualITree:1 IMV:1 BIO:0 LMChroma:1 HorCollocatedChroma:1 VerCollocatedChroma:0 MTS: 1(intra) 0(inter) SBT:1 ISP:1 SMVD:0 CompositeLTReference:0 Bcw:0 BcwFast:0 LADF:0 CIIP:1 Triangle:0 AllowDisFracMMVD:1 AffineAmvr:0 AffineAmvrEncOpt:0 DMVR:0 MmvdDisNum:6 JointCbCr:1 ACT:0 PLT:0 IBC:0 HashME:0 WrapAround:0 LoopFilterAcrossVirtualBoundaries:0 Reshape:1 (Signal:SDR Opt:0 CSoffset:1) MRL:1 MIP:0 EncDbOpt:0 
+FAST TOOL CFG: LCTUFast:1 FastMrg:1 PBIntraFast:1 IMV4PelFast:1 MTSMaxCand: 3(intra) 4(inter) ISPFast:0 AMaxBT:1 E0023FastEnc:1 ContentBasedFastQtbt:0 UseNonLinearAlfLuma:1 UseNonLinearAlfChroma:1 MaxNumAlfAlternativesChroma:8 FastLocalDualTree:2 NumSplitThreads:1 NumWppThreads:1+0 EnsureWppBitEqual:0 RPR:0 TemporalFilter:0 
+
+

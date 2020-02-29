@@ -1,0 +1,4 @@
+cd ../vmaf
+export PYTHONPATH="$(pwd)/python/src:$PYTHONPATH"
+cd ../VVCS
+echo $PYTHONPATH

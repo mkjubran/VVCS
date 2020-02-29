@@ -1,4 +1,4 @@
-/* The copyright in this software is being made available under the BSD
+ /* The copyright in this software is being made available under the BSD
  * License, included below. This software may be subject to other third party
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
@@ -2675,9 +2675,10 @@ bool EncAppCfg::xCheckParameter()
       for (int i = 0; i< m_RPLList0[curGOP].m_numRefPics; i++)
       {
         int absPOC = curPOC - m_RPLList0[curGOP].m_deltaRefPics[i];
+        printf("curGOP=%d ... curPOC=%d ... absPOC=%d ... deltaRefPics=%d\n",curGOP, curPOC,absPOC,m_RPLList0[curGOP].m_deltaRefPics[i]); //jubran
         if (absPOC < 0)
         {
-          beforeI = true;
+          beforeI = true ;
         }
         else
         {

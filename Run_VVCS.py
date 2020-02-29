@@ -6,7 +6,7 @@ import os, sys, subprocess, pdb
 import argparse
 import ConfigParser
 import datetime, math, time
-
+import ntpath
 
 INF = 999
 
@@ -59,10 +59,9 @@ def read_ranklist():
    f.close()
    iFNums=map(int, FNums)
 
-   ## get total number of frames
-   NumFrames=round(len(iFNums))
-   NumFrames=int(NumFrames)
-   return(iFNums,NumFrames)
+   iFNums = np.array(iFNums)
+   iFNums = iFNums[iFNums <= NumFrames]
+   return iFNums
 
 ###--------------------------------------------------------------
 ## convert iFNums from vector to matrix such that each row is a separate GOP
@@ -220,18 +219,24 @@ def Create_Encoder_Config(Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Mat
         #print('Stitching Frames in the Ref Picture set: Frame Numbers Relative to this GOP = {}').format(ref_pics_Stitching_array_Distributed)
 
     	##write config files header
-    	fid = open('{}/Part{}/encoder_HMS_GOP_{}.cfg'.format(Split_video_path,Pcnt,Pcnt),'w')
-    	print >> fid, '#======== Coding Structure ============='
-    	print >> fid, 'IntraPeriod                   : -1           # Period of I-Frame ( -1 = only first)'
-    	print >> fid, 'DecodingRefreshType           : 2           # Random Accesss 0:none, 1:CRA, 2:IDR, 3:Recovery Point SEI'
-    	print >> fid, 'GOPSize                       : '+str(GOP)+'           # GOP Size (number of B slice = GOPSize-1)'
-    	print >> fid, 'ReWriteParamSetsFlag          : 1           # Write parameter sets with every IRAP'
-    	'#        Type POC QPoffset QPOffsetModelOff QPOffsetModelScale CbQPoffset CrQPoffset QPfactor tcOffsetDiv2 betaOffsetDiv2 temporal_id #ref_pics_active #ref_pics reference pictures     predict     deltaRPS' '#ref_idcs reference idcs'
-    	print >> fid,''
-      
-        #fid.write('#Stitching Frames in the Ref Picture set: Global Frame Values = %s\n' % Abs_ref_pics_Stitching_array_Distributed)
-        #fid.write('#Stitching Frames in the Ref Picture set: Relative to this GOP = %s\n' % ref_pics_Stitching_array_Distributed)
-    	print >> fid,''
+    	fid = open('{}/Part{}/encoder_VVCS_GOP_{}.cfg'.format(Split_video_path,Pcnt,Pcnt),'w')
+	print >> fid, '#======== File I/O ==============='
+	print >> fid, 'InputFile                     : Traffic_2560x1600_30_crop.yuv'
+	print >> fid, 'InputBitDepth                 : 8           # Input bitdepth'
+	print >> fid, 'InputChromaFormat             : 420         # Ratio of luminance to chrominance samples'
+	print >> fid, 'FrameRate                     : 24          # Frame Rate per second'
+	print >> fid, 'FrameSkip                     : 0           # Number of frames to be skipped in input'
+	print >> fid, 'SourceWidth                   : 640        # Input  frame width'
+	print >> fid, 'SourceHeight                  : 480        # Input  frame height'
+	print >> fid, 'FramesToBeEncoded             : 150         # Number of frames to be coded'
+	print >> fid, '#======== Coding Structure ============='
+	print >> fid, 'IntraPeriod                   : -1          # Period of I-Frame ( -1 = only first)'
+	print >> fid, 'DecodingRefreshType           : 0           # Random Accesss 0:none, 1:CRA, 2:IDR, 3:Recovery Point SEI'
+        print >> fid, 'GOPSize                       : '+str(GOP)+'           # GOP Size (number of B slice = GOPSize-1)'
+	print >> fid, 'IntraQPOffset                 : -1'
+	print >> fid, 'LambdaFromQpEnable            : 1           # see JCTVC-X0038 for suitable parameters for IntraQPOffset, QPoffset, QPOffsetModelOff, QPOffsetModelScale when enabled'
+	print >> fid, '#        Type POC QPoffset QPOffsetModelOff QPOffsetModelScale CbQPoffset CrQPoffset QPfactor tcOffsetDiv2 betaOffsetDiv2 temporal_id #ref_pics_active_L0 #ref_pics_L0   reference_pictures_L0 #ref_pics_active_L1 #ref_pics_L1   reference_pictures_L1'
+	#print >> fid, 'Frame1:    P   1   5       -6.5                      0.2590         0          0          1.0      0            0               0             4                4         1 2 3 4      0   0'
 
     	## Buidling encoding structure for Stitching mode
     	ref_pics_stitch_to_use_Distributed=[]
@@ -264,15 +269,19 @@ def Create_Encoder_Config(Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Mat
 	
 	   GOPLine='Frame' + str(cnt) + ': P '+ str(cnt) +' 0 -6.5 0.2590 0 0 1.0 0 0 0 '+ str(len(ref_pics_Distributed)) + ' ' + str(len(ref_pics_Distributed))
 	   for cnt1 in range(len(ref_pics_Distributed)):
-	      GOPLine=GOPLine+' '+str(int(ref_pics_Distributed[cnt1]-cnt))
+	      GOPLine=GOPLine+' '+str(int(ref_pics_Distributed[cnt1] + 1))
 	   if cnt == 1:
-	      GOPLine=GOPLine+' 0'
-	   else:	
-	      GOPLine=GOPLine+' 2 0'
+	      GOPLine=GOPLine+' 0 0'
+	   else:
+	      GOPLine=GOPLine+' 0 0'
 			
            print >> fid, GOPLine
 
 	fid.write('\n#Note: The number of frames in the particitioned video is equal to GOP (Frame#0, Frame#1, .... Frame#(GOP-1)) and thus the line Frmae#GOP in this file will not be used to encode any frame, it is added to comply with the required format of HEVC GOP structure')
+
+        print >> fid, '### DO NOT ADD ANYTHING BELOW THIS LINE ###'
+        print >> fid, '### DO NOT DELETE THE EMPTY LINE BELOW ###'
+        print >> fid, '     '
         fid.close()
 
 ###--------------------------------------------------------------
@@ -288,13 +297,15 @@ def Encode_decode_video(Distributed_GOP_Matrix):
          now_start.append(datetime.datetime.now())
          print('Encoding GOP#{} of {} ... {}'.format(Pcnt,(np.shape(Distributed_GOP_Matrix)[0]-1),now_start[Pcnt].strftime("%Y-%m-%d %H:%M:%S")))
          InputYUV='{}/Part{}/Part{}.yuv'.format(Split_video_path,Pcnt,Pcnt)
-         BitstreamFile='{}/Part{}/HMEncodedVideo.bin'.format(Split_video_path,Pcnt)
+         BitstreamFile='{}/Part{}/VVCSEncodedVideo.bin'.format(Split_video_path,Pcnt)
+         ReconYUV='{}/Part{}/ReconPart{}.yuv'.format(Split_video_path,Pcnt,Pcnt)
          osout = call('rm -rf {}'.format(BitstreamFile))
-         osout = call('cp -f ./encoder_HMS.cfg {}/Part{}/encoder_HMS.cfg'.format(Split_video_path,Pcnt))
-   
+
          encoderlogfile='{}/Part{}/encoderlog.dat'.format(Split_video_path,Pcnt)
          fid = open(encoderlogfile,'w')
-         osout=call_bg_file('./HMS/bin/TAppEncoderStatic -c {}/Part{}/encoder_HMS.cfg -c {}/Part{}/encoder_HMS_GOP_{}.cfg --InputFile={} --SourceWidth={} --SourceHeight={} --SAO=0 --QP={} --FrameRate={} --FramesToBeEncoded={} --MaxCUSize={} --MaxPartitionDepth={} --QuadtreeTULog2MaxSize=4 --BitstreamFile="{}" --RateControl={} --TargetBitrate={}'.format(Split_video_path,Pcnt,Split_video_path,Pcnt,Pcnt,InputYUV,Width,Hight,QP,fps,GOP,MaxCUSize,MaxPartitionDepth,BitstreamFile,RateControl,rate),fid)
+         #osout=call_bg_file('./HMS/bin/TAppEncoderStatic -c {}/Part{}/encoder_HMS.cfg -c {}/Part{}/encoder_HMS_GOP_{}.cfg --InputFile={} --SourceWidth={} --SourceHeight={} --SAO=0 --QP={} --FrameRate={} --FramesToBeEncoded={} --MaxCUSize={} --MaxPartitionDepth={} --QuadtreeTULog2MaxSize=4 --BitstreamFile="{}" --RateControl={} --TargetBitrate={}'.format(Split_video_path,Pcnt,Split_video_path,Pcnt,Pcnt,InputYUV,Width,Hight,QP,fps,GOP,MaxCUSize,MaxPartitionDepth,BitstreamFile,RateControl,rate),fid)
+
+         osout = call_bg_file('./VVCOrig/bin/EncoderAppStatic -c ./VVCS/cfg/encoder_lowdelay_P_vtm.cfg -c {}/Part{}/encoder_VVCS_GOP_{}.cfg --InputFile={} --SourceWidth={} --SourceHeight={} --SAO=0 --InitialQP={} --FrameRate={} --FramesToBeEncoded={} --MaxCUSize={} --MaxPartitionDepth={}  --BitstreamFile="{}" --RateControl={} --TargetBitrate={} --ReconFile={}'.format(Split_video_path,Pcnt,Pcnt,InputYUV,Width,Hight,QP,fps,int(np.shape(Distributed_GOP_Matrix)[1]),MaxCUSize,MaxPartitionDepth,BitstreamFile,RateControl,rate,ReconYUV),fid)
          encoderlog.append(osout)
          PcntCompleted.append(Pcnt)
 
@@ -312,7 +323,8 @@ def Encode_decode_video(Distributed_GOP_Matrix):
                 print('Encoding of GOP#{} is completed ... {}   ({}) .. ({})'.format(Pcnt2,now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)- now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
             PcntCompleted=[]
 
-   ### decoding ---------------
+    ### decoding ---------------
+    '''
 
     PcntCompleted=[]
     Pcnt2=0
@@ -345,8 +357,8 @@ def Encode_decode_video(Distributed_GOP_Matrix):
                 now_end.append(datetime.datetime.now())
                 print('Decoding of GOP#{} is completed ... {}   ({}) .. ({})'.format(Pcnt2,now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)- now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
             PcntCompleted=[]
-
-   ### VMAF ---------------
+    '''
+    ### VMAF ---------------
 
     PcntCompleted=[]
     Pcnt2=0
@@ -356,11 +368,11 @@ def Encode_decode_video(Distributed_GOP_Matrix):
          now_start.append(datetime.datetime.now())
          print('Computing VMAF GOP#{} of {} ... {}'.format(Pcnt,(np.shape(Distributed_GOP_Matrix)[0]-1),now_start[Pcnt].strftime("%Y-%m-%d %H:%M:%S")))
          InputYUV='{}/Part{}/Part{}.yuv'.format(Split_video_path,Pcnt,Pcnt)
-         ReconFile='{}/Part{}/ReconPart{}.yuv'.format(Split_video_path,Pcnt,Pcnt)
+         ReconYUV='{}/Part{}/ReconPart{}.yuv'.format(Split_video_path,Pcnt,Pcnt)
          
          decoderVMAFlogfile='{}/Part{}/decoderVMAFlog.dat'.format(Split_video_path,Pcnt)
          fidVMAF = open(decoderVMAFlogfile,'w')
-         osout=call_bg_file('../vmaf/run_vmaf yuv420p {} {} {} {}'.format(Width,Hight,ReconFile,InputYUV),fidVMAF)
+         osout=call_bg_file('../vmaf/run_vmaf yuv420p {} {} {} {}'.format(Width,Hight,ReconYUV,InputYUV),fidVMAF)
 	 decoderVMAFlog.append(osout)
          
          PcntCompleted.append(Pcnt)
@@ -498,6 +510,7 @@ if __name__ == "__main__":
     num_ref_pics_active_Max=int(args.num_ref_pics_active_max);
     num_ref_pics_active_Stitching=int(args.num_ref_pics_active_stitching);
     vid=args.vid;
+    NumFrames=int(args.numframes)
 
     mode=args.mode;
     fps=int(args.fps);
@@ -526,22 +539,16 @@ if __name__ == "__main__":
     if GOP<(2*num_ref_pics_active_Max):
         GOP=2*num_ref_pics_active_Max
 
-    (iFNums,NumFrames)=read_ranklist();
-    iFNums=np.array(iFNums)
+    iFNums = read_ranklist();
     ref_pics_active_Stitching=iFNums[0:(num_ref_pics_active_Stitching)]
     ref_pics_active_Stitching=np.sort(ref_pics_active_Stitching)
     
     (Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Matrix)=Create_Distributed_GOP_Matrix();
-    #export_frames(vid)
     export_YUVframes(vid)
-    #Split_Video_GOP(Distributed_GOP_Matrix)
     Split_VideoYUV_GOP(Distributed_GOP_Matrix)
 
     print(Distributed_GOP_Matrix)
-    #print(ref_pics_active_Stitching)
-    #print(ref_pics_in_Distributed_GOP_Matrix)
 
     Create_Encoder_Config(Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Matrix)
     Encode_decode_video(Distributed_GOP_Matrix)
-    Combine_encoder_log(Distributed_GOP_Matrix)    
-    #print(Distributed_GOP_Matrix)
+    Combine_encoder_log(Distributed_GOP_Matrix)
