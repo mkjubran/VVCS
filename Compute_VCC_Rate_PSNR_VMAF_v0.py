@@ -122,7 +122,11 @@ if __name__ == '__main__':
 
    T1=fname1.split('.da')[0];
    T2=T1.split('_')[-1];
-   R1=int(T2)/1000
+   T3=T1.split('Rate')[-1];
+   if T2.isdigit():
+      R1=int(T2)/1000
+   else:
+      R1=int(T3)/1000
 
    print("{}	{}	{}	{}	{}").format(f1_numFrames,int(R1),TotalRatefn1,TotalPSNRfn1,TotalVMAFfn1)
 

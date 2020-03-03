@@ -253,7 +253,7 @@ def Create_Encoder_Config(Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Mat
 	
 	   GOPLine='Frame' + str(cnt) + ': P '+ str(cnt) +' 0 -6.5 0.2590 0 0 1.0 0 0 0 '+ str(len(ref_pics_Distributed)) + ' ' + str(len(ref_pics_Distributed))
 	   for cnt1 in range(len(ref_pics_Distributed)-1,-1,-1):
-	      GOPLine=GOPLine+' '+str(int(ref_pics_Distributed[cnt1] + 1))
+	      GOPLine=GOPLine+' '+str(int(ref_pics_Distributed[cnt1] + 1 - cnt))
 	   if cnt == 1:
 	      GOPLine=GOPLine+' 0 0'
 	   else:
@@ -380,7 +380,7 @@ def Encode_decode_video(Distributed_GOP_Matrix):
              decoderVMAFlog[Pcnt2].wait()
              PcntCompleted.remove(Pcnt2)
              ### replace Frame to VMAF_Frame in the log file
-             call('./Replace_Frame_to_VMAF_Frame --fn {}'.format(decoderVMAFlogfile))
+             #call('./Replace_Frame_to_VMAF_Frame --fn {}'.format(decoderVMAFlogfile))
              now_end.append(datetime.datetime.now())
              print('Computing VMAF of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)-now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
              Pcnt2=Pcnt2+1
@@ -389,7 +389,7 @@ def Encode_decode_video(Distributed_GOP_Matrix):
             for Pcnt2 in PcntCompleted:
                 decoderVMAFlog[Pcnt2].wait()
                 ### replace Frame to VMAF_Frame in the log file
-                call('./Replace_Frame_to_VMAF_Frame --fn {}'.format(decoderVMAFlogfile))
+                #call('./Replace_Frame_to_VMAF_Frame --fn {}'.format(decoderVMAFlogfile))
                 now_end.append(datetime.datetime.now())
                 print('Computing VMAF of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)- now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
             PcntCompleted=[]
@@ -552,15 +552,15 @@ if __name__ == "__main__":
     ref_pics_active_Stitching=np.sort(ref_pics_active_Stitching)
     
     (Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Matrix)=Create_Distributed_GOP_Matrix();
-    #export_YUVframes(vid)
-    #Split_VideoYUV_GOP(Distributed_GOP_Matrix)
+    export_YUVframes(vid)
+    Split_VideoYUV_GOP(Distributed_GOP_Matrix)
 
     print(Distributed_GOP_Matrix)
     #print(ref_pics_active_Stitching)
     #print(ref_pics_in_Distributed_GOP_Matrix)
 
-    #Create_Encoder_Config(Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Matrix)
+    Create_Encoder_Config(Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Matrix)
     Encode_decode_video(Distributed_GOP_Matrix)
-    #for Rcnt in range(len(RVector)):
-    #   Combine_encoder_log(Distributed_GOP_Matrix,int(RVector[Rcnt]))
-    #print(Distributed_GOP_Matrix)
+    for Rcnt in range(len(RVector)):
+       Combine_encoder_log(Distributed_GOP_Matrix,int(RVector[Rcnt]))
+    print(Distributed_GOP_Matrix)
