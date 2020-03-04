@@ -2675,7 +2675,7 @@ bool EncAppCfg::xCheckParameter()
       for (int i = 0; i< m_RPLList0[curGOP].m_numRefPics; i++)
       {
         int absPOC = curPOC - m_RPLList0[curGOP].m_deltaRefPics[i];
-        //printf("\n curGOP=%d ... curPOC=%d ... absPOC=%d ... deltaRefPics=%d\n",curGOP, curPOC,absPOC,m_RPLList0[curGOP].m_deltaRefPics[i]); //jubran
+        printf("\n curGOP=%d ... curPOC=%d ... absPOC=%d ... deltaRefPics=%d\n",curGOP, curPOC,absPOC,m_RPLList0[curGOP].m_deltaRefPics[i]); //jubran
         if (absPOC < 0)
         {
           beforeI = true ;
@@ -2685,7 +2685,7 @@ bool EncAppCfg::xCheckParameter()
           bool found = false;
           for (int j = 0; j<numRefs; j++)
           {
-            //printf("< j=%d , refList[j]=%d >,",j,refList[j]); //jubran
+            printf("< j=%d , refList[j]=%d >,",j,refList[j]); //jubran
             if (refList[j] == absPOC)
             {
               found = true;

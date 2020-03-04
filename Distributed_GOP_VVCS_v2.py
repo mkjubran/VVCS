@@ -252,9 +252,9 @@ def Create_Encoder_Config(Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Mat
 	         ref_pics_stitch_to_use_Distributed=np.append(ref_pics_stitch_to_use_Distributed,cnt)
 	
 	   GOPLine='Frame' + str(cnt) + ': P '+ str(cnt) +' 0 -6.5 0.2590 0 0 1.0 0 0 0 '+ str(len(ref_pics_Distributed)+1) + ' ' + str(len(ref_pics_Distributed)+1)
-	   for cnt1 in range(len(ref_pics_Distributed)-1,-1,-1):
+	   for cnt1 in range(len(ref_pics_Distributed)):
 	      GOPLine=GOPLine+' '+str(int(cnt - ref_pics_Distributed[cnt1]))
-           GOPLine = GOPLine + ' ' +str(GOP+cnt-1)
+           GOPLine = GOPLine + ' ' +str(GOP+cnt)
 	   if cnt == 1:
 	      GOPLine=GOPLine+' 0 0'
 	   else:
@@ -371,7 +371,7 @@ def Encode_decode_video(Distributed_GOP_Matrix):
          ReconFile='{}/Part{}/VVCSRecon_{}.bin'.format(Split_video_path,Pcnt,int(RVector[Rcnt]))
          decoderVMAFlogfile='{}/Part{}/decoderVMAFlog_{}.dat'.format(Split_video_path,Pcnt,int(RVector[Rcnt]))
          fidVMAF = open(decoderVMAFlogfile,'w')
-         osout=call_bg_file('../vmaf/run_vmaf yuv420p {} {} {} {}'.format(Width,Hight,ReconFile,InputYUV),fidVMAF)
+         osout=call_bg_file('../vmaf/run_vmaf yuv420p {} {} {} {}'.format(Width,Hight,InputYUV,ReconFile),fidVMAF)
 	 decoderVMAFlog.append(osout)
          
          PcntCompleted.append(Pcnt1)
