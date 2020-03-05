@@ -118,7 +118,7 @@ def Encode_decode_video():
        VMAFlog[cnt].wait()
        ### replace Frame to VMAF_Frame in the log file
        call('./Replace_Frame_to_VMAF_Frame --fn {}'.format(VMAFlogfile))
-       call('cp -f {} {}/{}_VVClog_{}.dat'.format(VMAFlogfile,RPath,fname,rate[cnt]))
+       call('cp -f {} {}/{}_VVClog_Rate{}.dat'.format(VMAFlogfile,RPath,fname,rate[cnt]))
 
        now_end.append(datetime.datetime.now())
        print('Encoding Rate {} is completed ... {}   ({}) .. ({})'.format(rate[cnt],now_end[cnt].strftime("%Y-%m-%d %H:%M:%S"),now_end[cnt].replace(microsecond=0)-now_start[cnt].replace(microsecond=0),now_end[cnt].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
