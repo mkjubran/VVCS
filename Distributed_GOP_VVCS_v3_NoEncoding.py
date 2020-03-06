@@ -356,7 +356,6 @@ def Encode_decode_video(Distributed_GOP_Matrix):
 
          Pcnt1=Pcnt1+1
     '''
-
    ### VMAF ---------------
 
     PcntCompleted=[]
@@ -374,31 +373,12 @@ def Encode_decode_video(Distributed_GOP_Matrix):
          decoderVMAFlogfile='{}/Part{}/decoderVMAFlog_{}.dat'.format(Split_video_path,Pcnt,int(RVector[Rcnt]))
          fidVMAF = open(decoderVMAFlogfile,'w')
          osout=call_bg_file('../vmaf/run_vmaf yuv420p {} {} {} {}'.format(Width,Hight,InputYUV,ReconFile),fidVMAF)
-	 decoderVMAFlog.append(osout)
-         
-         PcntCompleted.append(Pcnt1)
-         GOPDesc.append('Rate {} - GOP#{}'.format(int(RVector[Rcnt]),Pcnt))
-
-         if (int(len(PcntCompleted) % NProcesses) == 0):
-             decoderVMAFlog[Pcnt2].wait()
-             PcntCompleted.remove(Pcnt2)
-             ### replace Frame to VMAF_Frame in the log file
-             #call('./Replace_Frame_to_VMAF_Frame --fn {}'.format(decoderVMAFlogfile))
-             now_end.append(datetime.datetime.now())
-             print('Computing VMAF of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)-now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
-             Pcnt2=Pcnt2+1
-
-         if (Pcnt==(np.shape(Distributed_GOP_Matrix)[0]-1)) and ( Rcnt == ( len(RVector) - 1 )):
-            for Pcnt2 in PcntCompleted:
-                decoderVMAFlog[Pcnt2].wait()
-                ### replace Frame to VMAF_Frame in the log file
-                #call('./Replace_Frame_to_VMAF_Frame --fn {}'.format(decoderVMAFlogfile))
-                now_end.append(datetime.datetime.now())
-                print('Computing VMAF of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)- now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
-            PcntCompleted=[]
-
-         Pcnt1=Pcnt1+1
+         osout.wait()
+         now_end.append(datetime.datetime.now())
+         print('Computing VMAF Rate {} - GOP#{} of {} is completed ... {}   ({}) .. ({})'.format(int(RVector[Rcnt]),Pcnt,(np.shape(Distributed_GOP_Matrix)[0]-1),now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)- now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
+         Pcnt2+=1
     return
+
 ###--------------------------------------------------------------
 def Combine_encoder_log(Distributed_GOP_Matrix,rate):
     CombinedLines=[]
