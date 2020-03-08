@@ -281,9 +281,9 @@ def Encode_decode_video(Distributed_GOP_Matrix):
     now_start=[]
     now_end=[]
     GOPDesc=[]
-    for Pcnt in range(np.shape(Distributed_GOP_Matrix)[0]):
-      for Rcnt in range(len(RVector)):
-
+    #for Pcnt in range(np.shape(Distributed_GOP_Matrix)[0]):
+    for Rcnt in range(len(RVector)):
+      for Pcnt in range(np.shape(Distributed_GOP_Matrix)[0]):
          #osout = call('cp -f encoder_VVC_GOP_test.cfg {}/Part{}/encoder_VVCS_GOP_{}.cfg'.format(Split_video_path,Pcnt,RVector[Rcnt]))
 
          now_start.append(datetime.datetime.now())
@@ -328,8 +328,9 @@ def Encode_decode_video(Distributed_GOP_Matrix):
     now_start=[]
     now_end=[]
     GOPDesc=[]
-    for Pcnt in range(np.shape(Distributed_GOP_Matrix)[0]):
-      for Rcnt in range(len(RVector)):
+    #for Pcnt in range(np.shape(Distributed_GOP_Matrix)[0]):
+    for Rcnt in range(len(RVector)):
+      for Pcnt in range(np.shape(Distributed_GOP_Matrix)[0]):
          now_start.append(datetime.datetime.now())
          print('Computing VMAF Rate {} - GOP#{} of {} ... {}'.format(int(RVector[Rcnt]),Pcnt,(np.shape(Distributed_GOP_Matrix)[0]-1),now_start[Pcnt].strftime("%Y-%m-%d %H:%M:%S")))
          InputYUV='{}/Part{}/Part{}.yuv'.format(Split_video_path,Pcnt,Pcnt)
