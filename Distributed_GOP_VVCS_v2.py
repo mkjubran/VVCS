@@ -297,7 +297,6 @@ def Encode_decode_video(Distributed_GOP_Matrix):
          fid = open(encoderlogfile,'w')
          osout = call_bg_file('./VVCS/bin/EncoderAppStatic -c {}/Part{}/encoder_lowdelay_P_vtm.cfg  -c {}/Part{}/encoder_VVCS_GOP_{}.cfg --InputFile={} --SourceWidth={} --SourceHeight={} --SAO=0 --InitialQP={} --FrameRate={} --FramesToBeEncoded={} --MaxCUSize={} --MaxPartitionDepth={}  --BitstreamFile="{}" --RateControl={} --TargetBitrate={} --ReconFile={}'.format(Split_video_path,Pcnt,Split_video_path,Pcnt,Pcnt,InputYUV,Width,Hight,QP,fps,NumFrames,MaxCUSize,MaxPartitionDepth,BitstreamFile,RateControl,RVector[Rcnt],ReconFile),fid)
          encoderlog.append(osout)
-         encoderlog.append(osout)
          PcntCompleted.append(Pcnt1)
          GOPDesc.append('Rate {} - GOP#{}'.format(int(RVector[Rcnt]),Pcnt))
 

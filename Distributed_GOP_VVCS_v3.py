@@ -297,64 +297,29 @@ def Encode_decode_video(Distributed_GOP_Matrix):
          fid = open(encoderlogfile,'w')
          osout = call_bg_file('./VVCS/bin/EncoderAppStatic -c {}/Part{}/encoder_lowdelay_P_vtm.cfg  -c {}/Part{}/encoder_VVCS_GOP_{}.cfg --InputFile={} --SourceWidth={} --SourceHeight={} --SAO=0 --InitialQP={} --FrameRate={} --FramesToBeEncoded={} --MaxCUSize={} --MaxPartitionDepth={}  --BitstreamFile="{}" --RateControl={} --TargetBitrate={} --ReconFile={}'.format(Split_video_path,Pcnt,Split_video_path,Pcnt,Pcnt,InputYUV,Width,Hight,QP,fps,NumFrames,MaxCUSize,MaxPartitionDepth,BitstreamFile,RateControl,RVector[Rcnt],ReconFile),fid)
          encoderlog.append(osout)
-         encoderlog.append(osout)
          PcntCompleted.append(Pcnt1)
          GOPDesc.append('Rate {} - GOP#{}'.format(int(RVector[Rcnt]),Pcnt))
-
-         if (int(len(PcntCompleted) % NProcesses) == 0):
-             encoderlog[Pcnt2].wait()
-             PcntCompleted.remove(Pcnt2)
-             now_end.append(datetime.datetime.now())
-             print('Encoding of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)-now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
-             Pcnt2=Pcnt2+1
+         #print(PcntCompleted)
 
          if (Pcnt==(np.shape(Distributed_GOP_Matrix)[0]-1)) and ( Rcnt == ( len(RVector) - 1 )):
             for Pcnt2 in PcntCompleted:
                 encoderlog[Pcnt2].wait()
                 now_end.append(datetime.datetime.now())
                 print('Encoding of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)- now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
+                #print(Pcnt2)
+                #print(PcntCompleted)
             PcntCompleted=[]
-
-         Pcnt1=Pcnt1+1
-
-   ### decoding ---------------
-    '''
-    PcntCompleted=[]
-    Pcnt1=0
-    Pcnt2=0
-    now_start=[]
-    now_end=[]
-    GOPDesc=[]
-    for Pcnt in range(np.shape(Distributed_GOP_Matrix)[0]):
-      for Rcnt in range(len(RVector)):
-         now_start.append(datetime.datetime.now())
-         print('Decoding Rate {} - GOP#{} of {} ... {}'.format(RVector[Rcnt],Pcnt,(np.shape(Distributed_GOP_Matrix)[0]-1),now_start[Pcnt].strftime("%Y-%m-%d %H:%M:%S")))
-         OutputYUV='{}/Part{}/VVCoutput_{}_{}.yuv'.format(Split_video_path,Pcnt,fname,RVector[Rcnt])
-         BitstreamFile='{}/Part{}/VVCSEncodedVideo_{}.bin'.format(Split_video_path,Pcnt,int(RVector[Rcnt]))
-         #osout = call('rm -rf {}'.format(ReconYUVFile))
-         decoderlogfile='{}/Part{}/decoderlog_{}.dat'.format(Split_video_path,Pcnt,int(RVector[Rcnt]))
-         fid = open(decoderlogfile,'w')
-         osout = call_bg_file('./VVCS/bin/DecoderAppStatic -b {} -o {}'.format(BitstreamFile,OutputYUV),fid)
-         decoderlog.append(osout)
-         PcntCompleted.append(Pcnt1)
-         GOPDesc.append('Rate {} - GOP#{}'.format(int(RVector[Rcnt]),Pcnt))
-
-         if (int(len(PcntCompleted) % NProcesses) == 0):
-             decoderlog[Pcnt2].wait()
+         elif (int(len(PcntCompleted) % NProcesses) == 0):
+             encoderlog[Pcnt2].wait()
              PcntCompleted.remove(Pcnt2)
              now_end.append(datetime.datetime.now())
-             print('Decoding of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)-now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
+             print('.Encoding of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)-now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
+             #print(Pcnt2)
+             #print(PcntCompleted)
              Pcnt2=Pcnt2+1
 
-         if (Pcnt==(np.shape(Distributed_GOP_Matrix)[0]-1)) and ( Rcnt == ( len(RVector) - 1 )):
-            for Pcnt2 in PcntCompleted:
-                decoderlog[Pcnt2].wait()
-                now_end.append(datetime.datetime.now())
-                print('Decoding of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)- now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
-            PcntCompleted=[]
-
          Pcnt1=Pcnt1+1
-    '''
+
    ### VMAF ---------------
 
     PcntCompleted=[]
@@ -372,10 +337,29 @@ def Encode_decode_video(Distributed_GOP_Matrix):
          decoderVMAFlogfile='{}/Part{}/decoderVMAFlog_{}.dat'.format(Split_video_path,Pcnt,int(RVector[Rcnt]))
          fidVMAF = open(decoderVMAFlogfile,'w')
          osout=call_bg_file('../vmaf/run_vmaf yuv420p {} {} {} {}'.format(Width,Hight,InputYUV,ReconFile),fidVMAF)
-	 osout().wait()
-         now_end.append(datetime.datetime.now())
-         print('Computing VMAF Rate {} - GOP#{} of {} is completed ... {}   ({}) .. ({})'.format(int(RVector[Rcnt]),Pcnt,(np.shape(Distributed_GOP_Matrix)[0]-1),now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)- now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
-         Pcnt2=Pcnt2+1
+	 decoderVMAFlog.append(osout)
+         
+         PcntCompleted.append(Pcnt1)
+         GOPDesc.append('Rate {} - GOP#{}'.format(int(RVector[Rcnt]),Pcnt))
+
+         if (Pcnt==(np.shape(Distributed_GOP_Matrix)[0]-1)) and ( Rcnt == ( len(RVector) - 1 )):
+            for Pcnt2 in PcntCompleted:
+                decoderVMAFlog[Pcnt2].wait()
+                ### replace Frame to VMAF_Frame in the log file
+                #call('./Replace_Frame_to_VMAF_Frame --fn {}'.format(decoderVMAFlogfile))
+                now_end.append(datetime.datetime.now())
+                print('Computing VMAF of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)- now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
+            PcntCompleted=[]
+         elif (int(len(PcntCompleted) % NProcesses) == 0):
+             decoderVMAFlog[Pcnt2].wait()
+             PcntCompleted.remove(Pcnt2)
+             ### replace Frame to VMAF_Frame in the log file
+             #call('./Replace_Frame_to_VMAF_Frame --fn {}'.format(decoderVMAFlogfile))
+             now_end.append(datetime.datetime.now())
+             print('Computing VMAF of {} is completed ... {}   ({}) .. ({})'.format(GOPDesc[Pcnt2],now_end[Pcnt2].strftime("%Y-%m-%d %H:%M:%S"),now_end[Pcnt2].replace(microsecond=0)-now_start[Pcnt2].replace(microsecond=0),now_end[Pcnt2].replace(microsecond=0)-now_start[0].replace(microsecond=0)))
+             Pcnt2=Pcnt2+1
+
+         Pcnt1=Pcnt1+1
     return
 
 ###--------------------------------------------------------------
