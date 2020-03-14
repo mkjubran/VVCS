@@ -42,7 +42,7 @@ def Get_FNum_Rate_PSNR(fname):
              FNum=int(L[1])+0
              FRate=int(L[11])+0
              FPSNR=float(L[14])+0
-             if FPSNR > 3:
+             if (FPSNR > 4) and (FPSNR < 100):
 	        FNum_Rate_PSNR=np.append(FNum_Rate_PSNR,np.array([[FNum,FRate,FPSNR]]),0)
    FNum_Rate_PSNR=FNum_Rate_PSNR[1:np.size(FNum_Rate_PSNR,0)]
    return FNum_Rate_PSNR
