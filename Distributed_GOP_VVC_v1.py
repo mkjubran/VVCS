@@ -77,16 +77,29 @@ def Create_Distributed_GOP_Matrix():
    while len(NotAlloc_Frames)>0:
        Distributed_GOP_Vec=np.empty(0)
        ref_pics_active_Stitching_temp=ref_pics_active_Stitching
-       #### To add few frames at the beginning of GOp encoding .. lagging
-       ref_pics_active_Stitching_temp=np.append(ref_pics_active_Stitching_temp,(Distributed_GOP_Matrix[(len(Distributed_GOP_Matrix)-num_ref_pics_active_Max+num_ref_pics_active_Stitching):(len(Distributed_GOP_Matrix))]))
+       #### To add few frames at the beginning of GOP encoding .. lagging
+       if Distributed_GOP_Matrix.size == 0:
+          ref_pics_active_Stitching_temp=np.append(ref_pics_active_Stitching_temp,(Distributed_GOP_Matrix[(len(Distributed_GOP_Matrix)-num_ref_pics_active_Max+num_ref_pics_active_Stitching):(len(Distributed_GOP_Matrix))]))
+       else:
+          AddLagFrames = np.array(range(int(max(Distributed_GOP_Matrix))-num_ref_pics_active_Max+num_ref_pics_active_Stitching+1 , int(max(Distributed_GOP_Matrix))+1 ))
+          #print(AddLagFrames)
+          ref_pics_active_Stitching_temp=np.append(ref_pics_active_Stitching_temp,AddLagFrames)
+       #print(int(max(Distributed_GOP_Matrix))-num_ref_pics_active_Max+num_ref_pics_active_Stitching)
+       #print(range(int(max(Distributed_GOP_Matrix))-num_ref_pics_active_Max+num_ref_pics_active_Stitching,int(max(Distributed_GOP_Matrix))))
+
+#       ref_pics_active_Stitching_temp=np.append(ref_pics_active_Stitching_temp,range(int(max(Distributed_GOP_Matrix))-num_ref_pics_active_Max+num_ref_pics_active_Stitching):(int(max(Distributed_GOP_Matrix)))]))
+
+
+
        ref_pics_active_Stitching_temp=np.unique(ref_pics_active_Stitching_temp)
        ref_pics_active_Stitching_temp=np.sort(ref_pics_active_Stitching_temp)
        #print(ref_pics_active_Stitching)
-       #print(ref_pics_active_Stitching_temp)
+       #print(np.max(Distributed_GOP_Matrix))
        #print(Distributed_GOP_Matrix)
-       #pdb.set_trace()  
+       #pdb.set_trace()
        ####
        ref_pics_added=0;
+       AddFrames = True
        while len(Distributed_GOP_Vec)<GOP:
           if len(NotAlloc_Frames)==0:     #if all frames are allocated to Distributed Matrix
               break
@@ -98,11 +111,28 @@ def Create_Distributed_GOP_Matrix():
               if ref_pics_active_Stitching_temp[0] in ref_pics_active_Stitching:   ### added to avoid considering lag frames as stitchers
                  ref_pics_added=ref_pics_added+1
               ref_pics_active_Stitching_temp=np.delete(ref_pics_active_Stitching_temp,0)
+          elif AddFrames == False:
+              Distributed_GOP_Vec=np.append(Distributed_GOP_Vec,-100)
           else:
+              #print(NotAlloc_Frames[0])
+
+              #time.sleep(0.25)
+              #print(Distributed_GOP_Vec)
+
+              if (NotAlloc_Frames[0]+1 in ref_pics_active_Stitching) and not (NotAlloc_Frames[0]+1 in Distributed_GOP_Matrix):
+                   #print(NotAlloc_Frames[0])
+                   #print(Distributed_GOP_Vec)
+                   #print(ref_pics_active_Stitching)
+                   AddFrames = False
+                   #pdb.set_trace()
+
               Distributed_GOP_Vec=np.append(Distributed_GOP_Vec,NotAlloc_Frames[0])
               NotAlloc_Frames=np.delete(NotAlloc_Frames,0)
        if len(Distributed_GOP_Vec)==GOP:
               Distributed_GOP_Matrix=np.append(Distributed_GOP_Matrix,Distributed_GOP_Vec)
+              #print(ref_pics_active_Stitching)
+              print(Distributed_GOP_Vec)
+              pdb.set_trace()
        ref_pics_in_Distributed_GOP_Matrix=np.append(ref_pics_in_Distributed_GOP_Matrix,ref_pics_added)
    Distributed_GOP_Matrix=np.reshape(Distributed_GOP_Matrix,(int(len(Distributed_GOP_Matrix)/GOP),GOP))
    return(Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Matrix)
@@ -523,15 +553,15 @@ if __name__ == "__main__":
     ref_pics_active_Stitching=np.sort(ref_pics_active_Stitching)
 
     (Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Matrix)=Create_Distributed_GOP_Matrix();
-    export_YUVframes(vid)
-    Split_VideoYUV_GOP(Distributed_GOP_Matrix)
+    #export_YUVframes(vid)
+    #Split_VideoYUV_GOP(Distributed_GOP_Matrix)
 
     print(Distributed_GOP_Matrix)
     #print(ref_pics_active_Stitching)
     #print(ref_pics_in_Distributed_GOP_Matrix)
 
-    Create_Encoder_Config(Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Matrix)
-    Encode_decode_video(Distributed_GOP_Matrix)
-    for Rcnt in range(len(RVector)):
-       Combine_encoder_log(Distributed_GOP_Matrix,int(RVector[Rcnt]))
-    print(Distributed_GOP_Matrix)
+    #Create_Encoder_Config(Distributed_GOP_Matrix,ref_pics_in_Distributed_GOP_Matrix)
+    #Encode_decode_video(Distributed_GOP_Matrix)
+    #for Rcnt in range(len(RVector)):
+    #   Combine_encoder_log(Distributed_GOP_Matrix,int(RVector[Rcnt]))
+    #print(Distributed_GOP_Matrix)
